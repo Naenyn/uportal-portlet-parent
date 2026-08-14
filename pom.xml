@@ -369,6 +369,17 @@
         <artifactId>jul-to-slf4j</artifactId>
         <version>${slf4j.version}</version>
       </dependency>
+      <!--
+        | Log4j2 API bridge: routes calls made to the Log4j2 API
+        | (org.apache.logging.log4j:log4j-api) through to SLF4J/Logback.
+        | Needed by any library that adopted Log4j2 as its logging API
+        | (e.g. Apache POI 5.x, commons-compress 1.26+).
+      +-->
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-to-slf4j</artifactId>
+        <version>2.24.3</version>
+      </dependency>
       <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
@@ -659,11 +670,15 @@
                       <exclude>commons-collections:commons-collections:[3.2.1,4.0]</exclude>
                       <!-- Transitively brought in by portlet-mvc-util, should not be included -->
                       <exclude>javax.servlet:servlet-api</exclude>
-                      <!-- Only using slf4j and logback for logging; log4j
-                           1.x is EOL, log4j 2.x has historical CVEs and is
-                           not the project's chosen binding. -->
+                      <!-- Only using slf4j and logback for logging.
+                           log4j 1.x is EOL; log4j-core (2.x impl) carried
+                           Log4Shell and is not our chosen binding.
+                           log4j-api (2.x facade) is allowed — modern libs
+                           (POI 5.x, etc.) use it as their logging API and
+                           the log4j-to-slf4j bridge routes those calls to
+                           logback safely. -->
                       <exclude>commons-logging:commons-logging</exclude>
-                      <exclude>org.apache.logging.log4j</exclude>
+                      <exclude>org.apache.logging.log4j:log4j-core</exclude>
                       <exclude>log4j</exclude>
                       <!--
                         | Intentionally NOT banned here (as of v46):
